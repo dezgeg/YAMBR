@@ -8,7 +8,7 @@
 SDL_Surface *surface;
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
-#define SCREEN_BPP     16
+#define SCREEN_BPP     24
 #define FRAME_INTERVAL 30
 
 static void die(const char* message)
@@ -22,11 +22,13 @@ int main(int argc, char** argv)
 		die("SDL initialization failed");
 	atexit(SDL_Quit);
 
-	int videoFlags = SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
+	//int videoFlags = SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
+	int videoFlags = SDL_RESIZABLE | SDL_SWSURFACE | SDL_DOUBLEBUF;
 
 	surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
 	if(!surface)
 		die("Changing video mode failed");
+	init();
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event))

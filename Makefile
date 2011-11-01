@@ -5,7 +5,7 @@ LINK=gcc
 LIBS=-lm `sdl-config --cflags --libs`
 EXE=yambr
 
-OBJS=main.o events.o draw.o
+OBJS=main.o events.o draw.o util.o
 
 $(EXE): $(OBJS)
 	$(LINK) -o $(EXE) $(OBJS) $(LIBS)
