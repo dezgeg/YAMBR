@@ -5,12 +5,12 @@
 
 #include "gui.h"
 
-SDL_Surface *surface;
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP     24
 #define FRAME_INTERVAL 30
 
+GuiState gui;
 static void die(const char* message)
 {
 	fprintf(stderr, "%s: %s\n", message, SDL_GetError());
@@ -22,12 +22,11 @@ int main(int argc, char** argv)
 		die("SDL initialization failed");
 	atexit(SDL_Quit);
 
-	//int videoFlags = SDL_HWPALETTE | SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
-	int videoFlags = SDL_RESIZABLE | SDL_SWSURFACE | SDL_DOUBLEBUF;
-
-	surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
+	int videoFlags = SDL_RESIZABLE | SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
+	SDL_Surface* surface = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, videoFlags);
 	if(!surface)
 		die("Changing video mode failed");
+	gui.screen = surface;
 	init();
 
 	SDL_Event event;
@@ -51,6 +50,7 @@ int main(int argc, char** argv)
 							SCREEN_BPP, videoFlags);
 					if(!surface)
 						die("Lost video surface during resize");
+					update_image();
 					break;
 				case SDL_KEYDOWN:
 					handle_keypress(&event.key.keysym);
