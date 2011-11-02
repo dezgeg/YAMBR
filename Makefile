@@ -2,10 +2,10 @@ CC=gcc -std=c99 -I. $(CFLAGS)
 CFLAGS=-O3 -g -Wall -pedantic
 LINK=gcc
 
-LIBS=-lm `sdl-config --cflags --libs`
+LIBS=-lm `sdl-config --cflags --libs` -lSDL_gfx
 EXE=yambr
 
-OBJS=main.o events.o draw.o util.o mb.o
+OBJS=main.o events.o draw.o util.o mb.o selector.o
 
 $(EXE): $(OBJS)
 	$(LINK) -o $(EXE) $(OBJS) $(LIBS)

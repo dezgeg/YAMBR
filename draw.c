@@ -9,5 +9,6 @@ void setup_scene(void)
 void draw_scene(void)
 {
 	SDL_BlitSurface(gui.image, NULL, gui.screen, NULL);
+	selector_draw(gui.screen);
 	SDL_Flip(gui.screen);
 }

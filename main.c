@@ -40,13 +40,15 @@ int main(int argc, char** argv)
 	draw_scene();
 	while (true)
 	{
-		while (SDL_WaitEvent(&event))
+		bool redraw = false;
+		SDL_WaitEvent(NULL);
+		while (SDL_PollEvent(&event))
 		{
 			switch(event.type)
 			{
 				case SDL_ACTIVEEVENT:
 					if(event.active.state & SDL_APPACTIVE && event.active.gain)
-						draw_scene();
+						redraw = true;
 					break;			    
 				case SDL_VIDEORESIZE:
 					gui.screen = SDL_SetVideoMode(event.resize.w,
@@ -55,13 +57,16 @@ int main(int argc, char** argv)
 					if(!gui.screen)
 						die("Lost video surface during resize");
 					setup_scene();
-					draw_scene();
+					redraw = true;
 					break;
 				case SDL_KEYDOWN:
 					handle_keypress(&event.key.keysym);
 					break;
 				case SDL_MOUSEMOTION:
-					handle_mouse(&event.motion);
+				case SDL_MOUSEBUTTONDOWN:
+				case SDL_MOUSEBUTTONUP:
+					handle_mouse(&event);
+					redraw = true;
 					break;
 				case SDL_QUIT:
 					goto out;
@@ -69,6 +74,8 @@ int main(int argc, char** argv)
 					break;
 			}
 		}
+		if(redraw)
+			draw_scene();
 	}
 out:
 
