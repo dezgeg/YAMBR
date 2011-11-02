@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 
 #include "gui.h"
+#include "mb.h"
 
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
@@ -30,27 +31,31 @@ int main(int argc, char** argv)
 	init();
 
 	SDL_Event event;
-	while(SDL_PollEvent(&event))
-		;  /* ignore spurious mouse events at startup */
+	/* ignore spurious mouse events at startup */
+	do{
+		SDL_PumpEvents();
+	}while(SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_EVENTMASK(SDL_MOUSEMOTION)) == 1);
 
-	bool window_is_active = true;
+	setup_scene();
+	draw_scene();
 	while (true)
 	{
-		Uint32 next_update = SDL_GetTicks() + FRAME_INTERVAL;
-		while (SDL_PollEvent(&event))
+		while (SDL_WaitEvent(&event))
 		{
 			switch(event.type)
 			{
 				case SDL_ACTIVEEVENT:
-					window_is_active = event.active.gain;
+					if(event.active.state & SDL_APPACTIVE && event.active.gain)
+						draw_scene();
 					break;			    
 				case SDL_VIDEORESIZE:
-					surface = SDL_SetVideoMode(event.resize.w,
+					gui.screen = SDL_SetVideoMode(event.resize.w,
 							event.resize.h,
 							SCREEN_BPP, videoFlags);
-					if(!surface)
+					if(!gui.screen)
 						die("Lost video surface during resize");
-					update_image();
+					setup_scene();
+					draw_scene();
 					break;
 				case SDL_KEYDOWN:
 					handle_keypress(&event.key.keysym);
@@ -64,14 +69,6 @@ int main(int argc, char** argv)
 					break;
 			}
 		}
-		tick();
-		draw_scene();
-		if(window_is_active)
-			SDL_Flip(surface);
-
-		Sint32 delta = next_update - SDL_GetTicks();
-		if(delta > 0)
-			SDL_Delay(delta);
 	}
 out:
 
