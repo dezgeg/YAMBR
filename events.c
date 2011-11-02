@@ -1,8 +1,15 @@
 #include "gui.h"
 #include <complex.h>
+#include <math.h>
+
 static const double X_MIN = -2.5, X_MAX = 1.0;
 static const double Y_MIN = -1.0, Y_MAX = 1.0;
-static const int ITERS = 50;
+static const int ITERS = 30;
+
+static double get_color(int n, complex double z)
+{
+	return n - log2(log2(cabs(z)));
+}
 
 static inline double scale(double x, double xmin, double xmax, double ymin, double ymax)
 {
@@ -15,7 +22,7 @@ static inline double cabs2(complex double z)
 	return real * real + imag * imag;
 }
 
-
+Uint32 colors[256];
 void init(void)
 {
 		update_image();
@@ -28,6 +35,12 @@ void update_image(void)
 	flags |= SDL_SWSURFACE;
 	gui.image = SDL_ConvertSurface(gui.screen, gui.screen->format, flags);
 	SDL_Surface* surface = gui.image;
+
+	for(int i = 0; i < 256; i++)
+	{
+		double p = (double)i / 255.0;
+		colors[i] = SDL_MapRGB(surface->format, (1 - p) * 255.0, (1 - p) * 255.0, 255);
+	}
 
 	double width = (double)surface->w, height = (double)surface->h;
 	for(int i = 0; i < surface->w; i++)
@@ -46,8 +59,10 @@ void update_image(void)
 			if(k == ITERS)
 				put_pixel(surface, i, j, SDL_MapRGB(surface->format, 0, 0, 0));
 			else
-				put_pixel(surface, i, j, SDL_MapRGB(surface->format, 255, 255, 255));
+				put_pixel(surface, i, j, colors[(int)(256 * (get_color(k, z) / (double)ITERS))]);
+			//put_pixel(surface, i, j, colors[i % 256]);
 		}
+	printf("finished\n");
 }
 void handle_keypress(const SDL_keysym* keysym)
 {
